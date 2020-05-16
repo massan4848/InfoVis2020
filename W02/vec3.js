@@ -1,20 +1,50 @@
-Vec3 = function( x, y, z )
+class Vec3 
 {
-	this.x = x;
-	this.y = y;
-	this.z = z;
+	constructor(x,y,z)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
 
-// Add method
-Vec3.prototype.add = function( v )
-{
-	this.x += v.x;
-	this.y += v.y;
-	this.z += v.z;
-	return this;
-}
-// Sum method
-Vec3.prototype.sum = function()
-{
-	return this.x + this.y + this.z;
-}
+
+	// Add method
+	add( v ){
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+		return this;
+	}
+	substract( v ){
+		this.x -= v.x;
+		this.y -= v.y;
+		this.z -= v.z;
+		return this;
+	}
+
+	// Sum method
+	sum(){
+		return this.x + this.y + this.z;
+	}
+	max(){
+		return Math.max(this.x,this.y,this.z);
+	}
+	min(){
+		return Math.min(this.x,this.y,this.z);
+	}
+	mid(){
+		var ary = new Array(this.x,this.y,this.z);
+		var f =function(a,b){
+			return a - b;
+		}
+		ary.sort(f);
+		return ary[1];
+	}
+	norm2(){
+		return this.x*this.x+this.y*this.y+this.z*this.z;
+	}
+	inner( v ){
+		return this.x*v.x+this.y*v.y+this.z*v.z;
+	} 
+
 }

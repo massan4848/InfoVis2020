@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<title>W02: task2</title>
+	</head>
+	<body>
+        <script>document.write("x: ")</script>
+        <input type="text"
+                id = "nx"
+                value=""><br>
+        <script>document.write("y: ")</script>
+        <input type="text"
+                id = "ny"
+                value=""><br>
+        <script>document.write("z: ")</script>
+        <input type="text"
+                id = "nz"
+                value=""><br>
+        <input type = "button"
+                value ="click me"
+                id = "click_me">
+		<script src = "vec3.js"></script>
+		<script>
+            var element = document.getElementById('click_me');
+            element.addEventListener('click',run);           
+            function run(){
+                var x = document.getElementById("nx").value;
+                var y = document.getElementById("ny").value;
+                var z = document.getElementById("nz").value;
+                var v = new Vec3(x,y,z);
+                var min = v.min();
+                var mid = v.mid();
+                var max = v.max();
+                document.write("Min is " + min + "<br>" );
+                document.write("Mid is " + mid + "<br>");
+                document.write("Max is " + max + "<br>");
+            }
+		</script>
+	</body>
+</html>
+
+
+

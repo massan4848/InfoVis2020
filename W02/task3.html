@@ -1,0 +1,76 @@
+<html>
+	<head>
+		<title>W02: task3</title>
+	</head>
+	<body>
+        <script>document.write("vertex0<br>")</script>        
+        <script>document.write("x: ")</script>
+        <input type="text"
+                id = "nx0"
+                value="">
+        <script>document.write("y: ")</script>
+        <input type="text"
+                id = "ny0"
+                value="">
+        <script>document.write("z: ")</script>
+        <input type="text"
+                id = "nz0"
+                value="">
+        <br>
+        <script>document.write("vertex1<br>")</script>        
+        <script>document.write("x: ")</script>
+        <input type="text"
+                id = "nx1"
+                value="">
+        <script>document.write("y: ")</script>
+        <input type="text"
+                id = "ny1"
+                value="">
+        <script>document.write("z: ")</script>
+        <input type="text"
+                id = "nz1"
+                value="">
+        <br>
+        <script>document.write("vertex2<br>")</script>        
+        <script>document.write("x: ")</script>
+        <input type="text"
+                id = "nx2"
+                value="">
+        <script>document.write("y: ")</script>
+        <input type="text"
+                id = "ny2"
+                value="">
+        <script>document.write("z: ")</script>
+        <input type="text"
+                id = "nz2"
+                value=""> 
+
+        <input type = "button"
+                value ="click me"
+                id = "click_me">
+        <script src = "vec3.js"></script>
+        <script src = "areaoftriangle.js"></script>
+	<script>
+            var element = document.getElementById('click_me');
+            element.addEventListener('click',run);           
+            function run(){
+                var x0 = document.getElementById("nx0").value;
+                var y0 = document.getElementById("ny0").value;
+                var z0 = document.getElementById("nz0").value;
+                var v0 = new Vec3(x0,y0,z0);
+                var x1 = document.getElementById("nx1").value;
+                var y1 = document.getElementById("ny1").value;
+                var z1 = document.getElementById("nz1").value;
+                var v1 = new Vec3(x1,y1,z1);
+                var x2 = document.getElementById("nx2").value;
+                var y2 = document.getElementById("ny2").value;
+                var z2 = document.getElementById("nz2").value;
+                var v2 = new Vec3(x2,y2,z2);
+                window.alert("Square is "+AreaOfTriangle(v0, v1, v2).toFixed(4));
+            }
+	</script>
+	</body>
+</html>
+
+
+
