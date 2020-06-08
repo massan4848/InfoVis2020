@@ -4,14 +4,13 @@
     </head>
     <body>
 	<script src="https://threejs.org/build/three.min.js"></script>
-
+	<!--この書き方だと2回目のshader.vertのところが、スキップされるらしい-->
+	<!-- 修正はretask1.html -->
 	<script type="x-shader/x-vertex" id="shader.vert">
 		varying vec3 point_color;
 		varying vec4 point_position;
 		varying vec3 normal_vector;
-		uniform vec3 light_position;		
-		uniform vec3 camera_position;
-
+		uniform vec3 light_position;
 		vec3 LambertianReflection(vec3 C, vec3 L, vec3 N){
 			float ka = 0.4;
 			float kd = 0.6;
@@ -20,35 +19,13 @@
 			float Id = kd * dd;
 			return C * (Ia + Id );
 		} 
-
-		vec3 PhongReflection( vec3 C, vec3 L, vec3 N ,vec3 V){
-			float ka = 0.3;
-			float kd = 0.5;
-			float ks = 0.8;
-			float n = 50.0;
-			vec3 R = reflect(-L , N );
-			float dd = max( dot( N, L ), 0.0 );
-			float ds = pow( max( dot( R, V ), 0.0 ), n );
-			if ( dd <= 0.0 ) { ds = 0.0; }
-			float Ia = ka;
-			float Id = kd * dd;
-			float Is = ks * ds;
-			return C * ( Ia + Id + Is );
-		}
-
 		void main(){
 			point_position = modelViewMatrix * vec4( position, 1.0 );
 			normal_vector = normalMatrix * normal; 
 			vec3 C = color;
 			vec3 L = normalize( light_position - point_position.xyz );
 			vec3 N = normalize( normal_vector );
-			vec3 V = normalize(camera_position - point_position.xyz);
-			
-			#if defined( Lambert )
 			point_color = LambertianReflection( C, L, N );
-			#elif defined( Phong )
-			point_color = PhongReflection( C, L, N, V );
-			#endif
 			gl_Position = projectionMatrix * point_position;
 		}
 	</script>
@@ -59,27 +36,51 @@
 			gl_FragColor = vec4( point_color, 1.0 );
 		}
 	</script>
-	<div style = "width:1200px;">
-	<div>
-		<div id="display1" style="width:22%; float:left; margin-bottom: 5px;"></div>
-		<div id="display2" style="width:22%; float:left; margin-bottom: 5px;"></div>
-	</div>
-	</div>
-	<script src="task1.js"></script>
+	<script src="retask1.js"></script>
 	<script>
+	 main();
+	</script>
+	<script type="x-shader/x-vertex" id="shader.vert">
+		varying vec3 point_color;
+		varying vec4 point_position;
+		varying vec3 normal_vector;
+		uniform vec3 light_position;
+		uniform vec3 camera_position;
+		vec3 PhongReflection( vec3 C, vec3 L, vec3 N ){
+			float ka = 0.3;
+			float kd = 0.5;
+			float ks = 0.8;
+			float n = 50.0;
+			vec3 R = reflect(-L , N );
+			vec3 V = normalize(camera_position - point_position.xyz);
+			float dd = max( dot( N, L ), 0.0 );
+			float ds = pow( max( dot( R, V ), 0.0 ), n );
+			if ( dd <= 0.0 ) { ds = 0.0; }
+			float Ia = ka;
+			float Id = kd * dd;
+			float Is = ks * ds;
+			return C * ( Ia + Id + Is );
+		}
+		void main(){
+			point_position = modelViewMatrix * vec4( position, 1.0 );
+			normal_vector = normalMatrix * normal; 
+			vec3 C = color;
+			vec3 L = normalize( light_position - point_position.xyz );
+			vec3 N = normalize( normal_vector );
+			point_color = PhongReflection( C, L, N );
+			gl_Position = projectionMatrix * point_position;
+		}
+	</script>
 
-	 var vert_shader =  document.getElementById('shader.vert').text;
-	 var frag_shader = document.getElementById('shader.frag').text;
-	 var reflection_model = "Lambert";
-	 var target_dom = document.getElementById('display1');
-	 main(vert_shader,frag_shader,reflection_model,target_dom);
-	</script>	
+	<script type="x-shader/x-fragment" id="shader.frag">
+		varying vec3 point_color;
+		void main(){
+			gl_FragColor = vec4( point_color, 1.0 );
+		}
+	</script>
+	<script src="retask1.js"></script>
 	<script>
-	 var vert_shader =  document.getElementById('shader.vert').text;
-	 var frag_shader = document.getElementById('shader.frag').text;
-	 var reflection_model = "Phong";
-	 var target_dom = document.getElementById('display2');
-	 main(vert_shader,frag_shader,reflection_model,target_dom);
+	 main();
 	</script>
     </body>
 </html>

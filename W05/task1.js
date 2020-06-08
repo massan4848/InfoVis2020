@@ -1,7 +1,8 @@
-function main()
-{
-    var width = 500;
-    var height = 500;
+function main(vert_shader,frag_shader,reflection_model,target_dom)
+{   if(target_dom === undefined) target_dom = document.body;
+
+    var width = 250;
+    var height = 250;
 
     var scene = new THREE.Scene();
 
@@ -19,24 +20,25 @@ function main()
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize( width, height );
-    document.body.appendChild( renderer.domElement );
+    target_dom.appendChild( renderer.domElement );
 
     var geometry = new THREE.TorusKnotGeometry( 1, 0.3, 100, 20 );
     var material = new THREE.ShaderMaterial({
         vertexColors: THREE.VertexColors,
-        vertexShader: document.getElementById('shader.vert').text,
-        fragmentShader: document.getElementById('shader.frag').text,
-        uniforms :{
-            light_position :{type : 'v3', value : light.position}
+        vertexShader: vert_shader,
+        fragmentShader: frag_shader,
+        defines:{
+            Lambert: reflection_model == "Lambert",
+            Phong : reflection_model == "Phong"
         },
         uniforms :{
-            camera_position :{type : 'v3', value : camera.position}
+            light_position :{type : 'v3', value : light.position},
+            camera_position :{type : 'v3', value : camera.position},
         }
     });
 
     var torus_knot = new THREE.Mesh( geometry, material );
     scene.add( torus_knot );
-
     loop();
 
     function loop()
