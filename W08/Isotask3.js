@@ -1,18 +1,26 @@
-function Isosurfaces( volume, isovalue ){
-    var geometry = new THREE.Geometry();
-    var material = new THREE.MeshLambertMaterial();
-
+function Isosurfaces( volume, isovalue, light ,camera){
     var smin = volume.min_value;
     var smax = volume.max_value;
     isovalue = KVS.Clamp( isovalue, smin, smax );
-
+    
     var lut = new KVS.MarchingCubesTable();
     var cell_index = 0;
     var counter = 0;
+    
     var vx =volume.resolution.x;
     var vy =volume.resolution.y;
     var vz =volume.resolution.z;
     
+    var geometry = new THREE.Geometry();
+    var material = new THREE.ShaderMaterial({
+        vertexColors: THREE.VertexColors,
+        vertexShader: document.getElementById('shader.vert').text,
+        fragmentShader: document.getElementById('shader.frag').text,
+        uniforms :{
+            light_position :{type : 'v3', value : light},
+            camera_position :{type : 'v3', value : camera},
+        }
+    });
     for ( var z = 0; z < vz - 1; z++ ){
         for ( var y = 0; y < vy - 1; y++ ){
             for ( var x = 0; x < vx - 1; x++ ){

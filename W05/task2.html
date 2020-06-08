@@ -40,7 +40,7 @@
 		gl_FragColor = vec4( shaded_color, 1.0 );
 	 }
 	</script>
-	<script src="task1.js"></script>
+	<script src="task2.js"></script>
 	<script>
 	 main();
 	</script>
@@ -55,9 +55,9 @@
 			normal_vector = normalMatrix * normal;
 			gl_Position = projectionMatrix * point_position; 
 		}
-		</script>
+	</script>
 	
-		<script type="x-shader/x-fragment" id="shader.frag">
+	<script type="x-shader/x-fragment" id="shader.frag">
 		varying vec3 point_color;
 		varying vec4 point_position;
 		varying vec3 normal_vector;
@@ -86,7 +86,7 @@
 			gl_FragColor = vec4( shaded_color, 1.0 );
 		 }
 		</script>
-		<script src="task1.js"></script>
+		<script src="task2.js"></script>
 		<script>
 		 main();
 		</script>

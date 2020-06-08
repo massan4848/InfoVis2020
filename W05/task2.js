@@ -24,7 +24,7 @@ function main()
     var geometry = new THREE.TorusKnotGeometry( 1, 0.3, 100, 20 );
     var material = new THREE.ShaderMaterial({
         vertexColors: THREE.VertexColors,
-        vertexShader: document.getElementById('gouraud.vert').text,
+        vertexShader: document.getElementById('shader.vert').text,
         fragmentShader: document.getElementById('shader.frag').text,
     });
 
