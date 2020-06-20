@@ -7,7 +7,13 @@
 
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
-
+<div>
+  <b>すかいらーくホールディングス(3197)の2020年1月1日から6月18日までの株価推移</b><br>
+  この会社はガストやバーミヤン、じゅうじゅうカルビなどの飲食店を経営している。
+  2月の始めは2000円台だったが、3月の中旬までに1500円台まで落ち込んでいる。
+  これはコロナウイルスによる業績悪化を想定して安くなったと思われる。
+  4月7日に非常事態宣言が出されてからは、持ち帰り販売による売上の増加が期待されて株価がゆるやかに上昇していると思われる。
+</div>
 
 <script>
 
@@ -26,7 +32,8 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 //Read the data
-d3.csv("https://massan4848.github.io/InfoVis2020/W12/3197_2020.csv",
+// d3.csv("https://massan4848.github.io/InfoVis2020/W12/3197.csv",
+d3.csv("https://raw.githubusercontent.com/massan4848/InfoVis2020/master/W12/3197.csv",
 
 
   // When reading the csv, I must format variables:
@@ -47,11 +54,11 @@ d3.csv("https://massan4848.github.io/InfoVis2020/W12/3197_2020.csv",
 
     // Add Y axis
     var y = d3.scaleLinear()
-      .domain([0, d3.max(data, function(d) { return +d.value; })])
+      .domain([1200, d3.max(data, function(d) { return +d.value; })])
       .range([ height, 0 ]);
     svg.append("g")
       .call(d3.axisLeft(y));
-
+    
     // Add the line
     svg.append("path")
       .datum(data)
@@ -62,7 +69,6 @@ d3.csv("https://massan4848.github.io/InfoVis2020/W12/3197_2020.csv",
         .x(function(d) { return x(d.date) })
         .y(function(d) { return y(d.value) })
         )
-
 })
 
 </script>
