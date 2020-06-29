@@ -1,0 +1,229 @@
+<html>
+    <head>
+	<title>Task</title>
+    </head>
+    <body style="margin:0">
+	<script src="three.min.js"></script>
+	<script src="TrackballControls.js"></script>
+	<script src="http://threejs.org/examples/js/math/Lut.js"></script>
+	<script src="http://naohisas.github.io/KVS.js/Build/KVS.min.js"></script>
+	<script src="http://naohisas.github.io/KVS.js/Build/KVS2THREE.min.js"></script>
+	<script src="http://naohisas.github.io/KVS.js/Source/KVSLobsterData.js"></script>
+
+	<script type="x-shader/x-vertex" id="phong.vert">
+	 varying vec4 point_position;
+	 varying vec3 normal_vector;
+
+	 void main(){
+	     point_position = modelViewMatrix * vec4( position, 1.0 );
+	     normal_vector = normalMatrix * normal;
+
+	     gl_Position = projectionMatrix * point_position;
+	 }
+	</script>
+
+	<script type="x-shader/x-fragment" id="phong.frag">
+	 varying vec4 point_position;
+	 varying vec3 normal_vector;
+	 uniform vec3 point_color;
+	 uniform vec3 light_position;
+	 uniform vec3 camera_position;
+	 uniform int reflection_model;
+
+	 vec3 LambertianReflection( vec3 C, vec3 L, vec3 N ){
+	     float ka = 0.3;
+	     float kd = 0.5;
+
+	     float dd = dot( N, L );
+	     float Ia = ka;
+	     float Id = kd * dd;
+             return C * ( Ia + Id );
+	 }
+
+	 vec3 PhongReflection( vec3 C, vec3 L, vec3 N, vec3 V ){
+	     float ka = 0.3;
+	     float kd = 0.5;
+	     float ks = 0.8;
+	     float n = 50.0;
+
+	     vec3 R = reflect( -L, N );
+	     float dd = dot( N, L );
+	     float ds = 0.0;
+	     if ( dd > 0.0 )
+	     {
+		 ds = pow( dot( R, V ), n );
+	     }
+
+	     float Ia = ka;
+	     float Id = kd * dd;
+	     float Is = ks * ds;
+	     return C * ( Ia + Id + Is );
+	 }
+
+	 vec3 BlinnPhongReflection( vec3 C, vec3 L, vec3 N, vec3 V ){
+	     float ka = 0.3;
+	     float kd = 0.5;
+	     float ks = 0.8;
+	     float n = 50.0;
+
+	     vec3 H = normalize( L + V );
+	     float dd = dot( N, L );
+	     float ds = 0.0;
+	     if ( dd > 0.0 )
+	     {
+		 ds = pow( dot( H, N ), n );
+	     }
+
+	     float Ia = ka;
+	     float Id = kd * dd;
+	     float Is = ks * ds;
+	     return C * ( Ia + Id + Is );
+	 }
+
+	 vec3 CookTorranceReflection( vec3 C, vec3 L, vec3 N, vec3 V ){
+	     float ka = 0.3;
+	     float kd = 0.5;
+	     float ks = 0.8;
+	     float m = 0.2; // roughness. [0:smooth, 1:rough]
+	     float F0 = 0.2;
+
+	     float dd = dot( N, L );
+	     float ds = 0.0;
+	     if ( dd > 0.0 )
+	     {
+		 vec3 H = normalize( L + V );
+		 float NL = dd;
+		 float NH = dot( N, H );
+		 float NV = dot( N, V );
+		 float VH = dot( V, H );
+
+		 // Beckmann distribution
+		 float NH2 = NH * NH;
+		 float NH4 = NH2 * NH2;
+		 float D = ( 1.0 / ( 4.0 * m * m * NH4 ) ) * exp( ( NH2 - 1.0 ) / ( m * m * NH2 ) );
+
+		 // Geometrical attenuation factor
+		 float G = min( 1.0, min( 2.0 * NH * NV / VH, 2.0 * NH * NL / VH ) );
+
+		 // Fresnel term
+		 float n = ( 1.0 + sqrt( F0 ) ) / ( 1.0 - sqrt( F0 ) );
+		 float c = VH;
+		 float g = sqrt( n * n + c * c - 1.0 );
+		 float gc0 = g - c;
+		 float gc1 = g + c;
+		 float cgc0 = c * gc1 - 1.0;
+		 float cgc1 = c * gc0 + 1.0;
+		 float f0 = ( gc0 * gc0 ) / ( gc1 * gc1 );
+		 float f1 = 1.0 + ( cgc0 / cgc1 ) * ( cgc0 / cgc1 );
+		 float F = 0.5 * f0 * f1;
+
+		 // Specular component
+		 ds = ( F / 3.14159265 ) * ( D * G / ( NL * NV ) );
+	     }
+
+	     float Ia = ka;
+	     float Id = kd * dd;
+	     float Is = ks * ds;
+	     return C * ( Ia + Id + Is );
+	 }
+
+	 void main(){
+	     vec3 C = point_color;
+	     vec3 L = normalize( light_position - point_position.xyz );
+	     vec3 N = normalize( normal_vector );
+	     vec3 V = normalize( camera_position - point_position.xyz );
+
+	     #if defined( Lambert )
+	     vec3 shaded_color = LambertianReflection( C, L, N );
+	     #elif defined( Phong )
+	     vec3 shaded_color = PhongReflection( C, L, N, V );
+	     #elif defined( BlinnPhong )
+	     vec3 shaded_color = BlinnPhongReflection( C, L, N, V );
+	     #elif defined( CookTrrance )
+	     vec3 shaded_color = CookTorranceReflection( C, L, N, V );
+	     #else
+	     vec3 shaded_color = C;
+	     #endif
+
+	     gl_FragColor = vec4( shaded_color, 1.0 );
+	 }
+	</script>
+	<script src="Bounds.js"></script>
+	<script src="isosurfaces.js"></script>
+    <script src="task.js"></script>
+
+    <div id = "display" style = "width:70%; float: left;"></div>
+    <div id = "controller" style = "width:30%; float:right;">
+        <label id="label" style = "font-family:Arial;">Isosurfaces</label>
+        <input type = "range" min = "0" max = "255" step = "1" value = "150" id = "isovalue"/>
+		<button id = "change-isovalue" style="font-family:Arial;">Apply</button><br>
+		<label id="label" style = "font-family:Arial;">Reflection model</label>
+			<select id="reflection">
+				<option value= "CookTrrance">Cook-Trrance Reflection</option>
+				<option value= "Phong">Phong Reflection</option>
+				<option value= "Lambert">Lambertian Reflection</option>
+				<option value= "BlinnPhong">Blinn-Phong Reflection</option>
+			</select>
+	</div>
+	<script>
+		main()
+	</script>
+	<h2>Overview</h2>
+	<div>
+		<ul>
+			等値面の変更とreflection modelの変更を可能にするUIを作成した。
+			<li>
+				Isosurfaces<br>
+				バーをスライドさせてApplyボタンを押すと、バーの値に対応する等値面を表示する。
+				その値は0~255までの256段階である。
+				<br>
+			</li>
+			<li>
+				reflection model<br>
+				選択肢の中から、reflection modelを選択できる。
+				選択肢はCook-Trrance Reflection model, Phong Reflection,Lambertian Reflection,Binn-Phong Reflectionである。
+				<br>
+			</li>
+
+		</ul>
+	</div>
+
+	<h2>Visualizetion Results</h2>
+	<div>
+		Isosurfaces の変化<br>
+		<table>
+			<tr>
+				<td><img src="./p1.png" width="100%"></td>
+				<td><img src="./p2.png" width="100%"></td>
+				<td><img src="./p3.png" width="100%"></td>
+			</tr>
+			<tr>
+				<td>Isosurfaces = 150</td>
+				<td>Isosurfaces = 60</td>
+				<td>Isosurfaces = 200</td>
+			</tr>
+		</table>
+		<br>
+		reflection model の変化<br>
+		<table>
+			<tr>
+				<td><img src="./p1.png" width="100%"></td>
+				<td><img src="./p4.png" width="100%"></td>
+				<td><img src="./p5.png" width="100%"></td>
+				<td><img src="./p6.png" width="100%"></td>
+			</tr>
+			<tr>
+				<td>Cook-Trrance reflrection</td>				
+				<td>Phong reflrection</td>
+				<td>Lambertian reflrection</td>
+				<td>Binn-Phongreflrection</td>
+			</tr>
+			<br>
+		</table>
+		<div>
+			isosurfacesでは値に対応した色で表現されていることが確認できる。
+			reflection modelではモデルごとに光沢の具合が異なることが確認できる。
+		</div>
+	</div>
+	</body>
+</html>
