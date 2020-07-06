@@ -11,29 +11,27 @@ function main(){
     screen.scene.add( bounds );
 
     var isovalue = document.getElementById("isovalue").value;
-    var select = document.getElementById("reflection");
+    var reflection_model = document.getElementById("reflection").value;
+    var ka =  document.getElementById("ka").value;
+    var kd =  document.getElementById("kd").value;
+    var ks =  document.getElementById("ks").value;
 
-    var surfaces = Isosurfaces( volume, isovalue, screen.camera, screen.light );
+
+    var surfaces = Isosurfaces( volume, isovalue, screen.camera, screen.light,reflection_model,ka,kd,ks);
     screen.scene.add( surfaces );
 
-    var element = document.getElementById('change-isovalue');
+    var element = document.getElementById('change');
     element.addEventListener('click',function(){
         screen.scene.remove(surfaces);
         isovalue = document.getElementById("isovalue").value;
-        reflection_model = document.getElementById("reflection").value;
-        surfaces = Isosurfaces( volume, isovalue, screen.camera, screen.light, reflection_model );
+        var reflection_model = document.getElementById("reflection").value;
+        var ka =  document.getElementById("ka").value;
+        var kd =  document.getElementById("kd").value;
+        var ks =  document.getElementById("ks").value;
+        surfaces = Isosurfaces( volume, isovalue, screen.camera, screen.light, reflection_model,ka,kd,ks );
         screen.scene.add( surfaces );
-        console.log(isovalue);
+        console.log(isovalue,reflection_model,ka,kd,ks);
     });
-
-    select.addEventListener('change',function(){
-        screen.scene.remove(surfaces);
-        reflection_model = document.getElementById("reflection").value;
-        surfaces = Isosurfaces( volume, isovalue, screen.camera, screen.light, reflection_model );
-        screen.scene.add( surfaces );
-        console.log(-1);
-    });
-
 
     document.addEventListener( 'mousemove', function() {
         screen.light.position.copy( screen.camera.position );
